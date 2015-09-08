@@ -2,18 +2,16 @@ from coords import PixelCoord
 
 
 class Camera(object):
-    def __init__(self, x_size, y_size):
+    _screen_size = None
+    _screen_centre_x = None
+    _screen_centre_y = None
 
-        self.pos = PixelCoord(0, 10, scale=30)
+    _calc_pos = None
+    _screen_bounds = None
 
-        self._screen_size = None
-        self._screen_centre_x = None
-        self._screen_centre_y = None
-
+    def __init__(self, x_size, y_size, scale=30):
+        self.pos = PixelCoord(0, 0, scale)
         self.screen_size = x_size, y_size
-
-        self._calc_pos = None
-        self._screen_bounds = None
 
     @property
     def screen_size(self):
@@ -30,26 +28,19 @@ class Camera(object):
     def screen_bounds(self):
         if self._screen_bounds is None or self._calc_pos != self.pos:
 
-            print("CALCULATE BOUNDS:", end='')
-
             self._calc_pos = self.pos.copy()
 
             screen_width, screen_height = self.screen_size
 
-            tile_width = self.pos.scale * 2.0
-            tile_height = self.pos.scale * 2.0
+            half_draw_width = (screen_width / 2) + self.pos.scale
+            half_draw_height = (screen_height / 2) + self.pos.scale
 
-            half_draw_width = (screen_width + tile_width) / 2
-            half_draw_height = (screen_height + tile_height) / 2
-
-            min_x = - half_draw_width
-            max_x = + half_draw_width
-            min_y = - half_draw_height
-            max_y = + half_draw_height
-
-            self._screen_bounds = min_x, max_x, min_y, max_y
-
-            print(self._screen_bounds)
+            self._screen_bounds = (
+                0 - half_draw_width,
+                0 + half_draw_width,
+                0 - half_draw_height,
+                0 + half_draw_height,
+            )
 
         return self._screen_bounds
 
